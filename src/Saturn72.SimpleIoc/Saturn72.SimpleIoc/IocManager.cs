@@ -5,19 +5,24 @@ namespace Saturn72.SimpleIoc
 {
     public class IocManager : IRegistrar, IResolver
     {
-        private readonly IDictionary<Type, Func<object>> _resolutionDictionary = new Dictionary<Type, Func<object>>();
+        private IDictionary<Type, Func<object>> _resolutionDictionary;
 
         public TService Resolve<TService>()
         {
-            return (TService) (_resolutionDictionary.ContainsKey(typeof(TService))
-                ? _resolutionDictionary[typeof(TService)]()
+            return (TService) (ResolutionDictionary.ContainsKey(typeof(TService))
+                ? ResolutionDictionary[typeof(TService)]()
                 : null);
+        }
+
+        protected IDictionary<Type, Func<object>> ResolutionDictionary
+        {
+            get => _resolutionDictionary ?? (_resolutionDictionary = new Dictionary<Type, Func<object>>());
+            set => _resolutionDictionary = value;
         }
 
         public void Register<TService>(Func<object> resolutionFunc)
         {
-            _resolutionDictionary[typeof(TService)] = resolutionFunc;
+            ResolutionDictionary[typeof(TService)] = resolutionFunc;
         }
-
     }
 }
